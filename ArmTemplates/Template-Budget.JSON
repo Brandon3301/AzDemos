@@ -1,0 +1,66 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "budgetName": {
+      "type": "string",
+      "defaultValue": "BudgetForMin"
+    },
+    "amount": {
+      "type": "int",
+      "defaultValue": 1
+    },
+    "timeGrain": {
+      "type": "string",
+      "defaultValue": "Monthly",
+      "allowedValues": [ "Monthly", "Quarterly", "Annually" ]
+    },
+    "startDate": {
+      "type": "string"
+    },
+    "endDate": {
+      "type": "string"
+    },
+    "firstThresholdPercentage": {
+      "type": "int",
+      "defaultValue": 1
+    },
+    "contactEmails": {
+      "type": "array"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Consumption/budgets",
+      "apiVersion": "2023-11-01",
+      "name": "[parameters('budgetName')]",
+      "properties": {
+        "timePeriod": {
+          "startDate": "[parameters('startDate')]",
+          "endDate": "[parameters('endDate')]"
+        },
+        "timeGrain": "[parameters('timeGrain')]",
+        "amount": "[parameters('amount')]",
+        "category": "Cost",
+        "notifications": {
+          "CostAlert": {
+            "enabled": true,
+            "operator": "GreaterThan",
+            "threshold": "[parameters('firstThresholdPercentage')]",
+            "contactEmails": "[parameters('contactEmails')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "name": {
+      "type": "string",
+      "value": "[parameters('budgetName')]"
+    },
+    "resourceId": {
+      "type": "string",
+      "value": "[subscriptionResourceId('Microsoft.Consumption/budgets', parameters('budgetName'))]"
+    }
+  }
+}
